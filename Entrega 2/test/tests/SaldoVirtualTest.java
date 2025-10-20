@@ -3,11 +3,6 @@ package tests;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import pagos.PasarelaPago;
-import pagos.PasarelaPagoMock;
-import usuarios.Cliente;
-
-
 public class SaldoVirtualTest extends BaseEscenario {
 
     @Test

@@ -9,9 +9,7 @@ import usuarios.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-/**
- * Clase base de pruebas. Crea un escenario común con un evento, cliente y venue aprobados.
- */
+/** Clase base de pruebas. Crea un escenario común con un evento, cliente y venue aprobados. */
 public class BaseEscenario {
 
     protected Administrador admin;
