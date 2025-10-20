@@ -12,6 +12,10 @@ public class Cliente extends Usuario {
         super(login, contrasena);
     }
 
+    public Cliente(String login, String contrasena, double saldoInicial) {
+        super(login, contrasena, saldoInicial);
+    }
+
     public TransaccionCompra comprarTiquete(Evento evento, Localidad localidad, int cantidad) {
         TransaccionCompra tx = new TransaccionCompra(this, evento, localidad, cantidad);
         if (tx.ejecutar()) {

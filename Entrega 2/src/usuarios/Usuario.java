@@ -2,6 +2,7 @@ package usuarios;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import pagos.PasarelaPago;
 import transacciones.Transaccion;
 import transacciones.TransaccionReembolso;
@@ -17,6 +18,12 @@ public class Usuario {
     public Usuario(String login, String contrasena) {
         this.login = login;
         this.contrasena = contrasena;
+    }
+
+    public Usuario(String login, String contrasena, double saldoInicial) {
+        this.login = login;
+        this.contrasena = contrasena;
+        this.saldoVirtual = Math.max(0, saldoInicial);
     }
 
     public boolean login(String correo, String contrasena) {
@@ -61,7 +68,11 @@ public class Usuario {
     }
 
     public String getLogin() { return login; }
+
+    public String getContrasena() { return contrasena; }
+
     public double getSaldoVirtual() { return saldoVirtual; }
+
     public List<Transaccion> getTransacciones() { return transacciones; }
 }
 

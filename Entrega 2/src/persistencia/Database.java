@@ -4,16 +4,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eventos.Evento;
-import eventos.Localidad;
 import eventos.Venue;
-import tiquetes.Tiquete;
 import usuarios.Usuario;
 
+/** Contenedor en memoria. La escritura/lectura real la hace JsonStore. */
 public class Database {
-    public final List<Usuario> usuarios = new ArrayList<>();
-    public final List<Venue> venues = new ArrayList<>();
-    public final List<Evento> eventos = new ArrayList<>();
-    public final List<Localidad> localidades = new ArrayList<>();
-    public final List<Tiquete> tiquetes = new ArrayList<>();
+
+    private final List<Usuario> usuarios = new ArrayList<>();
+    private final List<Venue> venues = new ArrayList<>();
+    private final List<Evento> eventos = new ArrayList<>();
+
+    // --- Usuarios
+    public List<Usuario> getUsuarios() { return usuarios; }
+    public void addUsuario(Usuario u) { if (u != null) usuarios.add(u); }
+
+    // --- Venues
+    public List<Venue> getVenues() { return venues; }
+    public void addVenue(Venue v) { if (v != null) venues.add(v); }
+
+    // --- Eventos
+    public List<Evento> getEventos() { return eventos; }
+    public void addEvento(Evento e) { if (e != null) eventos.add(e); }
+
+    public void clear() {
+        usuarios.clear();
+        venues.clear();
+        eventos.clear();
+    }
 }
 

@@ -38,5 +38,9 @@ public abstract class Tiquete {
 
     protected void marcarVendido() { this.estado = EstadoTiquete.Vendido; }
     protected void marcarTransferido() { this.estado = EstadoTiquete.Transferido; }
+
+    public void setEstadoDesdePersistencia(EstadoTiquete estado) {
+        this.estado = estado;
+    }
 }
 

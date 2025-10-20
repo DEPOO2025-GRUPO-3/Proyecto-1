@@ -1,6 +1,4 @@
 module proyecto1 {
-    requires java.sql;
-
     requires org.junit.jupiter.api;
 
     exports administracion;

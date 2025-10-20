@@ -2,6 +2,7 @@ package tiquetes;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import usuarios.Usuario;
 
 public class TiqueteMultiple extends Tiquete {
@@ -33,5 +34,9 @@ public class TiqueteMultiple extends Tiquete {
 
     @Override
     public void transferir(Usuario destino) { transferirPaquete(destino); }
+
+    public int getCantidadIncluida() { return cantidadIncluida; }
+    public TipoMultiple getTipo() { return tipo; }
+    public List<TiqueteSimple> getContenidos() { return contenidos; }
 }
 
