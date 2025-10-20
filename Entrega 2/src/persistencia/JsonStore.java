@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-
 import eventos.EstadoEvento;
 import eventos.Evento;
 import eventos.Localidad;
@@ -22,7 +20,7 @@ import tiquetes.TiqueteMultiple;
 import tiquetes.TipoMultiple;
 import usuarios.Usuario;
 
-/** Persistencia JSON mínima (manual) a ./data/db.json */
+
 public class JsonStore {
 
     private final Path dataDir = Path.of("data");
@@ -55,7 +53,6 @@ public class JsonStore {
         }
     }
 
-    // =============== SERIALIZACIÓN ===============
 
     private static String esc(String s) {
         if (s == null) return "";
@@ -157,7 +154,6 @@ public class JsonStore {
         return sb.toString();
     }
 
-    // =============== DESERIALIZACIÓN ===============
 
     private static String between(String src, String key, int fromIdx) {
         int k = src.indexOf("\"" + key + "\"", fromIdx);

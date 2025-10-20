@@ -1,12 +1,9 @@
 package tests;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
-
 import org.junit.jupiter.api.Test;
-
 import eventos.Evento;
 import eventos.Localidad;
 import eventos.TipoEvento;
@@ -22,7 +19,6 @@ public class PersistenciaJsonTest {
 
     @Test
     void guardaYLuegoCarga() {
-        // Construir DB
         Database db = new Database();
 
         Administrador admin = new Administrador("admin@acme.com", "admin123");

@@ -2,12 +2,10 @@ package persistencia;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import eventos.Evento;
 import eventos.Venue;
 import usuarios.Usuario;
 
-/** Contenedor en memoria. La escritura/lectura real la hace JsonStore. */
 public class Database {
 
     private final List<Usuario> usuarios = new ArrayList<>();
