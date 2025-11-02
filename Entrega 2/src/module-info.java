@@ -8,5 +8,6 @@ module proyecto1 {
     exports tiquetes;
     exports transacciones;
     exports usuarios;
+    exports marketplace;
 }
 

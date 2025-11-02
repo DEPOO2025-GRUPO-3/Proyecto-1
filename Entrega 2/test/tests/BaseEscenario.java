@@ -9,7 +9,6 @@ import usuarios.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-/** Clase base de pruebas. Crea un escenario común con un evento, cliente y venue aprobados. */
 public class BaseEscenario {
 
     protected Administrador admin;
@@ -21,7 +20,6 @@ public class BaseEscenario {
     protected Evento evento;
     protected Localidad plat;
 
-    /** Crea el entorno común de pruebas: usuarios, evento y tiquetes. */
     protected void setupBasico() {
         admin = new Administrador("admin@acme.com", "admin123");
         org   = new Organizador("org@acme.com", "org123");
@@ -40,7 +38,6 @@ public class BaseEscenario {
         }
         evento.agregarLocalidad(plat);
 
-        // Abono inicial al saldo virtual
         cli.abonarSaldo(1_000_000, "123-456", pasarela);
     }
 }
