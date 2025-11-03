@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry excluding="Consolas/ConsolaUtil.java" kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="src" path="consolas"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
 			<attribute name="module" value="true"/>

@@ -1,4 +1,6 @@
-package Consolas;
+package consolas;
+
+import usuarios.Usuario;
 
 public class AdminConsola extends MainConsola {
 
@@ -9,7 +11,7 @@ public class AdminConsola extends MainConsola {
     @Override
     protected void afterBoot() {
         if (db.getUsuarios().isEmpty()) {
-            db.addUsuario(new usuarios.Usuario("admin", "admin", 0));
+            db.addUsuario(new Usuario("admin", "admin", 0));
         }
     }
 
@@ -23,7 +25,9 @@ public class AdminConsola extends MainConsola {
     }
 
     @Override
-    protected int maxOpcion() { return 3; }
+    protected int maxOpcion() {
+        return 3;
+    }
 
     @Override
     protected boolean handleOption(int op) {
@@ -37,25 +41,29 @@ public class AdminConsola extends MainConsola {
     }
 
     private void crearUsuario() {
-        String login = ConsolaUtil.readNonEmpty("Login: ");
-        String pass  = ConsolaUtil.readNonEmpty("Contraseña: ");
-        double saldo = ConsolaUtil.readDouble("Saldo inicial: ", 0, 1_000_000_000);
-        db.addUsuario(new usuarios.Usuario(login, pass, saldo));
+        String login = readNonEmpty("Login: ");
+        String pass  = readNonEmpty("Contraseña: ");
+        double saldo = readDouble("Saldo inicial: ", 0, 1_000_000_000);
+        db.addUsuario(new Usuario(login, pass, saldo));
         System.out.println("Usuario creado.");
-        ConsolaUtil.pause();
+        pause();
     }
 
     private void listarUsuarios() {
-        if (db.getUsuarios().isEmpty()) { System.out.println("No hay usuarios."); return; }
+        if (db.getUsuarios().isEmpty()) {
+            System.out.println("No hay usuarios.");
+            return;
+        }
         db.getUsuarios().forEach(u ->
-                System.out.printf("- %s | saldo: %.2f\n", u.getLogin(), u.consultarSaldo()));
-        ConsolaUtil.pause();
+                System.out.printf("- %s | saldo: %.2f%n", u.getLogin(), u.consultarSaldo()));
+        pause();
     }
 
     private void guardarAhora() {
         jsonStore.save(db);
         mpStore.save(db, mp);
         System.out.println("Guardado manual completo.");
-        ConsolaUtil.pause();
+        pause();
     }
 }
+
