@@ -1,7 +1,7 @@
 {
   "ofertas": [
     {
-      "id":"3671c90c-c30e-4cb1-be2f-7b00cf47ee18",
+      "id":"03fd1fbf-1d87-4de1-a52c-870143522bbe",
       "vendedor":"vendedor",
       "tiqueteId":"TQ004",
       "precio":120.0,
@@ -11,6 +11,6 @@
     }
   ],
   "log": [
-    {"fechaHora":"2025-11-02T18:01:25.971098","usuario":"vendedor","accion":"Oferta creada","detalle":"Oferta 3671c90c-c30e-4cb1-be2f-7b00cf47ee18 por $120.0 publicada."}
+    {"fechaHora":"2025-11-02T23:51:00.467504400","usuario":"vendedor","accion":"Oferta creada","detalle":"Oferta 03fd1fbf-1d87-4de1-a52c-870143522bbe por $120.0 publicada."}
   ]
 }

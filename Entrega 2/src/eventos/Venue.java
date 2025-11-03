@@ -37,7 +37,7 @@ public class Venue {
 
     public void aprobar() { this.aprobado = true; }
 
-    void reservar(LocalDate fecha) { fechasReservadas.add(fecha); }
+    public void reservar(LocalDate fecha) { fechasReservadas.add(fecha); }
 
     public boolean isAprobado() { return aprobado; }
     public String getId() { return id; }
