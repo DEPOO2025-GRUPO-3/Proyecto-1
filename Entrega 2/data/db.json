@@ -2,7 +2,8 @@
   "usuarios": [
     {"login":"admin@acme.com","contrasena":"admin123","saldo":0.0},
     {"login":"org@acme.com","contrasena":"org123","saldo":0.0},
-    {"login":"cli@mail.com","contrasena":"clave","saldo":500000.0}
+    {"login":"cli@mail.com","contrasena":"clave","saldo":500000.0},
+    {"login":"Juanes","contrasena":"Juanes","saldo":100000.0}
   ],
   "venues": [
     {"id":"V1","nombre":"Arena","ubicacion":"Bogotá","capacidad":10000,"restricciones":"Sin pirotecnia","aprobado":true}

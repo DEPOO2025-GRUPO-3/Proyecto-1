@@ -42,6 +42,12 @@ public abstract class MainConsola {
 
 
     protected void login() {
+        if (db.getUsuarios().isEmpty()) {
+            db.addUsuario(new Usuario("admin", "admin", 0));
+            jsonStore.save(db);
+            System.out.println("[BOOT] No había usuarios. Se creó admin/admin con saldo 0.");
+        }
+
         System.out.println("== Autenticación ==");
         for (int i = 0; i < 3; i++) {
             String login = readNonEmpty("Usuario: ");
@@ -61,6 +67,7 @@ public abstract class MainConsola {
         System.out.println("Demasiados intentos fallidos.");
         System.exit(1);
     }
+
 
 
     public final void runLoop() {

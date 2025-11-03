@@ -4,17 +4,19 @@ import usuarios.Usuario;
 
 public class AdminConsola extends MainConsola {
 
+
     public static void main(String[] args) {
         new AdminConsola().runLoop();
     }
-
+    
     @Override
     protected void afterBoot() {
         if (db.getUsuarios().isEmpty()) {
             db.addUsuario(new Usuario("admin", "admin", 0));
+            		jsonStore.save(db);
         }
     }
-
+    
     @Override
     protected void renderMenu() {
         System.out.println("\n=== ADMIN ===");
