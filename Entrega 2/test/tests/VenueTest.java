@@ -10,13 +10,11 @@ public class VenueTest {
 
     private Venue venue;
     private Evento evento1;
-    private Evento evento2;
 
     @BeforeEach
     void setUp() {
         venue = new Venue("V001", "Auditorio Nacional", "Bogotá", 5000, "No eventos deportivos");
         evento1 = new Evento("E001", "Concierto A", LocalDate.of(2025, 11, 10), LocalTime.of(20, 0), TipoEvento.musical, venue);
-        evento2 = new Evento("E002", "Concierto B", LocalDate.of(2025, 11, 11), LocalTime.of(18, 0), TipoEvento.deportivo, venue);
     }
 
     @Test
