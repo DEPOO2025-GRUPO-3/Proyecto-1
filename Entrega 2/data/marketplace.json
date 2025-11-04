@@ -1,7 +1,22 @@
 {
   "ofertas": [
+<<<<<<< Updated upstream
   ],
   "log": [
     {"fechaHora":"2025-11-03T18:10:51.314074500","usuario":"vendedor","accion":"Oferta creada","detalle":"Oferta f5e1385d-1503-4710-a414-d575cf3a2a2a por $120.0 publicada."}
+=======
+    {
+      "id":"fe2d92d8-1e42-4eec-8a25-7eddaaffbb1e",
+      "vendedor":"vendedor",
+      "tiqueteId":"TQ004",
+      "precio":120.0,
+      "activa":true,
+      "contraofertas":[
+      ]
+    }
+  ],
+  "log": [
+    {"fechaHora":"2025-11-03T17:46:33.183467","usuario":"vendedor","accion":"Oferta creada","detalle":"Oferta fe2d92d8-1e42-4eec-8a25-7eddaaffbb1e por $120.0 publicada."}
+>>>>>>> Stashed changes
   ]
 }
