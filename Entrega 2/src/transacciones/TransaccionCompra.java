@@ -43,8 +43,14 @@ public class TransaccionCompra extends Transaccion {
 
         int asignados = 0;
         for (Tiquete t : localidad.getTiquetes()) {
-            if (asignados == cantidad) break;
+            if (asignados == cantidad) {
+                break;
+            }
             if (t instanceof TiqueteSimple && t.getEstado() == EstadoTiquete.Disponible) {
+
+                t.asociarEventoYLocalidad(evento, localidad);
+                t.asignarComprador(usuario);
+
                 t.transferir(usuario);
                 asignados++;
             }

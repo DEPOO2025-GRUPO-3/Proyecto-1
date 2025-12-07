@@ -13,4 +13,3 @@ public class QRException extends Exception {
     }
 }
 
-//FALTA IMPLEMENTAR
