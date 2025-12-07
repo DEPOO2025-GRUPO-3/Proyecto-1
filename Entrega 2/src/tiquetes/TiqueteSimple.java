@@ -10,12 +10,24 @@ public class TiqueteSimple extends Tiquete {
 
     @Override
     public void transferir(Usuario destino) {
-        if (destino == null || !validarEstado()) return;
-        marcarTransferido();
+        if (destino == null || !validarEstado()) {
+            return;
+        }
+
+        Usuario anterior = this.comprador;
+        asignarComprador(destino);
+
+        if (anterior == null) {
+            marcarVendido();
+        } else {
+            marcarTransferido();
+        }
     }
 
     public void aplicarDescuento(double porc) {
-        if (porc <= 0) return;
+        if (porc <= 0) {
+            return;
+        }
         double factor = Math.max(0.0, 1.0 - (porc / 100.0));
         this.precioPublico = this.precioPublico * factor;
     }

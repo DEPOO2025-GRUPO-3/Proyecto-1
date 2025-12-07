@@ -2,7 +2,7 @@
   "usuarios": [
     {"login":"admin@acme.com","contrasena":"admin123","saldo":0.0},
     {"login":"org@acme.com","contrasena":"org123","saldo":0.0},
-    {"login":"cli@mail.com","contrasena":"clave","saldo":500000.0},
+    {"login":"cli@mail.com","contrasena":"clave","saldo":1.99999999988E15},
     {"login":"Juanes","contrasena":"Juanes","saldo":100000.0}
   ],
   "venues": [
@@ -23,7 +23,7 @@
           "nombre":"Platea",
           "precioBase":120000.0,
           "tiquetes": [
-            {"id":"T1","estado":"Disponible","tipo":"Simple"},
+            {"id":"T1","estado":"Vendido","tipo":"Simple"},
             {"id":"T2","estado":"Disponible","tipo":"Simple"},
             {"id":"T3","estado":"Disponible","tipo":"Simple"}
           ]
