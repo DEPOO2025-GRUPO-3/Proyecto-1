@@ -1,220 +1,115 @@
 package ui.login;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 
-import marketplace.Marketplace;
-import persistencia.Database;
-import persistencia.JsonStore;
-import persistencia.MarketplaceStore;
-import usuarios.Administrador;
-import usuarios.Cliente;
-import usuarios.Organizador;
 import usuarios.Usuario;
 
 public class LoginDialog extends JDialog {
 
-    private static final long serialVersionUID = 1L;
-
-    private final Database database;
-    private final Marketplace marketplace;
-    private final JsonStore jsonStore;
-    private final MarketplaceStore marketplaceStore;
-
+    private final List<Usuario> usuarios;
     private JTextField txtUsuario;
-    private JPasswordField txtContrasena;
+    private JPasswordField txtPassword;
     private JComboBox<String> comboRol;
 
-    public LoginDialog(JFrame owner,
-                       Database database,
-                       Marketplace marketplace,
-                       JsonStore jsonStore,
-                       MarketplaceStore marketplaceStore) {
-        super(owner, "Boletamaster - Inicio de sesión", true);
-        this.database = database;
-        this.marketplace = marketplace;
-        this.jsonStore = jsonStore;
-        this.marketplaceStore = marketplaceStore;
-        inicializarComponentes();
-        pack();
+    private boolean aceptado;
+    private Usuario usuarioSeleccionado;
+    private String rolSeleccionado;
+
+    public LoginDialog(java.awt.Frame owner, List<Usuario> usuarios) {
+        super(owner, "Inicio de sesión", true);
+        this.usuarios = usuarios;
+        setSize(360, 220);
         setLocationRelativeTo(owner);
-        setResizable(false);
-
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                cerrarAplicacion();
-            }
-        });
+        setLayout(new BorderLayout());
+        add(crearPanelCampos(), BorderLayout.CENTER);
+        add(crearPanelBotones(), BorderLayout.SOUTH);
     }
 
-    // ---------------------------------------------------------------------
-    // Inicialización UI
-    // ---------------------------------------------------------------------
+    private JPanel crearPanelCampos() {
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
 
-    private void inicializarComponentes() {
-        setLayout(new BorderLayout(10, 10));
+        panel.add(new JLabel("Usuario:"));
+        txtUsuario = new JTextField();
+        panel.add(txtUsuario);
 
-        JPanel panelCampos = new JPanel(new GridLayout(3, 2, 5, 5));
-        panelCampos.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.add(new JLabel("Contraseña:"));
+        txtPassword = new JPasswordField();
+        panel.add(txtPassword);
 
-        // Usuario
-        panelCampos.add(new JLabel("Usuario (login):"));
-        txtUsuario = new JTextField(15);
-        panelCampos.add(txtUsuario);
+        panel.add(new JLabel("Rol:"));
+        comboRol = new JComboBox<>();
+        comboRol.addItem("Administrador");
+        comboRol.addItem("Organizador");
+        comboRol.addItem("Cliente");
+        panel.add(comboRol);
 
-        // Contraseña
-        panelCampos.add(new JLabel("Contraseña:"));
-        txtContrasena = new JPasswordField(15);
-        panelCampos.add(txtContrasena);
-
-        // Rol
-        panelCampos.add(new JLabel("Rol:"));
-        comboRol = new JComboBox<>(new String[] { "Cliente", "Organizador", "Administrador" });
-        panelCampos.add(comboRol);
-
-        add(panelCampos, BorderLayout.CENTER);
-
-        // Botones
-        JPanel panelBotones = new JPanel();
-        JButton btnIngresar = new JButton("Ingresar");
-        JButton btnSalir = new JButton("Salir");
-
-        btnIngresar.addActionListener(e -> intentarLogin());
-        btnSalir.addActionListener(e -> cerrarAplicacion());
-
-        panelBotones.add(btnIngresar);
-        panelBotones.add(btnSalir);
-
-        add(panelBotones, BorderLayout.SOUTH);
+        return panel;
     }
 
-    // ---------------------------------------------------------------------
-    // Lógica de login
-    // ---------------------------------------------------------------------
+    private JPanel crearPanelBotones() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton btnAceptar = new JButton("Ingresar");
+        JButton btnCancelar = new JButton("Cancelar");
+        btnAceptar.addActionListener(e -> intentarLogin());
+        btnCancelar.addActionListener(e -> cancelar());
+        panel.add(btnAceptar);
+        panel.add(btnCancelar);
+        return panel;
+    }
 
     private void intentarLogin() {
-        String login = txtUsuario.getText() != null ? txtUsuario.getText().trim() : "";
-        char[] passChars = txtContrasena.getPassword();
-        String pass = new String(passChars);
-
+        String login = txtUsuario.getText().trim();
+        String pass = new String(txtPassword.getPassword());
         if (login.isEmpty() || pass.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "Debes ingresar usuario y contraseña.",
-                    "Datos incompletos",
-                    JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Debe ingresar usuario y contraseña.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
-        Usuario encontrado = buscarUsuarioPorLogin(login);
-
-        if (encontrado == null || !pass.equals(encontrado.getContrasena())) {
-            JOptionPane.showMessageDialog(this,
-                    "Usuario o contraseña inválidos.",
-                    "Error de autenticación",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        String rolSeleccionado = (String) comboRol.getSelectedItem();
-
-        if (!rolCoincideConUsuario(rolSeleccionado, encontrado)) {
-            JOptionPane.showMessageDialog(this,
-                    "El usuario no corresponde al rol seleccionado.",
-                    "Rol incorrecto",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        abrirVentanaPrincipalSegunRol(rolSeleccionado, encontrado);
-        dispose();
-    }
-
-    private Usuario buscarUsuarioPorLogin(String login) {
-        for (Usuario u : database.getUsuarios()) {
-            if (u.getLogin() != null && u.getLogin().equals(login)) {
-                return u;
+        Usuario encontrado = null;
+        for (Usuario u : usuarios) {
+            if (u.getLogin().equals(login) && u.getContrasena().equals(pass)) {
+                encontrado = u;
+                break;
             }
         }
-        return null;
-    }
-
-    private boolean rolCoincideConUsuario(String rolSeleccionado, Usuario u) {
-        boolean coincide = false;
-
-        if ("Administrador".equals(rolSeleccionado) && u instanceof Administrador) {
-            coincide = true;
-        } else if ("Organizador".equals(rolSeleccionado) && u instanceof Organizador) {
-            coincide = true;
-        } else if ("Cliente".equals(rolSeleccionado) && u instanceof Cliente) {
-            coincide = true;
+        if (encontrado == null) {
+            JOptionPane.showMessageDialog(this, "Credenciales inválidas.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
-
-        return coincide;
-    }
-
-    private void abrirVentanaPrincipalSegunRol(String rolSeleccionado, Usuario u) {
-        Runnable tarea = null;
-
-        if ("Administrador".equals(rolSeleccionado) && u instanceof Administrador) {
-            Administrador admin = (Administrador) u;
-            tarea = () -> {
-                ui.admin.AdminFrame frame =
-                        new ui.admin.AdminFrame(database, marketplace, jsonStore, marketplaceStore, admin);
-                frame.setVisible(true);
-            };
-        } else if ("Organizador".equals(rolSeleccionado) && u instanceof Organizador) {
-            Organizador org = (Organizador) u;
-            tarea = () -> {
-                ui.organizador.OrganizadorFrame frame =
-                        new ui.organizador.OrganizadorFrame(database, marketplace, jsonStore, marketplaceStore, org);
-                frame.setVisible(true);
-            };
-        } else if ("Cliente".equals(rolSeleccionado) && u instanceof Cliente) {
-            Cliente cliente = (Cliente) u;
-            tarea = () -> {
-                ui.cliente.ClienteFrame frame =
-                        new ui.cliente.ClienteFrame(database, marketplace, jsonStore, marketplaceStore, cliente);
-                frame.setVisible(true);
-            };
-        }
-
-        if (tarea != null) {
-            SwingUtilities.invokeLater(tarea);
-        }
-    }
-
-    // ---------------------------------------------------------------------
-    // Cierre de la app
-    // ---------------------------------------------------------------------
-
-    private void cerrarAplicacion() {
-        try {
-            jsonStore.save(database);
-            marketplaceStore.save(database, marketplace);
-        } catch (Exception e) {
-            // En una app real se podría loguear, aquí solo mostramos mensaje.
-            JOptionPane.showMessageDialog(this,
-                    "Error guardando datos antes de salir:\n" + e.getMessage(),
-                    "Persistencia",
-                    JOptionPane.ERROR_MESSAGE);
-        }
+        aceptado = true;
+        usuarioSeleccionado = encontrado;
+        rolSeleccionado = (String) comboRol.getSelectedItem();
         dispose();
-        System.exit(0);
+    }
+
+    private void cancelar() {
+        aceptado = false;
+        usuarioSeleccionado = null;
+        rolSeleccionado = null;
+        dispose();
+    }
+
+    public boolean isAceptado() {
+        return aceptado;
+    }
+
+    public Usuario getUsuarioSeleccionado() {
+        return usuarioSeleccionado;
+    }
+
+    public String getRolSeleccionado() {
+        return rolSeleccionado;
     }
 }
 

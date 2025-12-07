@@ -1,235 +1,254 @@
 package ui.organizador;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.FlowLayout;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
+import javax.swing.JTextArea;
 
 import eventos.Evento;
 import eventos.TipoEvento;
 import eventos.Venue;
+import marketplace.Marketplace;
 import persistencia.Database;
-import usuarios.Organizador;
+import persistencia.JsonStore;
+import persistencia.MarketplaceStore;
+import usuarios.Usuario;
 
 public class OrganizadorFrame extends JFrame {
 
     private final Database db;
-    private final Organizador organizador;
+    private final Marketplace mp;
+    private final JsonStore jsonStore;
+    private final MarketplaceStore mpStore;
+    private final Usuario actual;
 
-    private JTextField txtIdVenue;
-    private JTextField txtNombreVenue;
-    private JTextField txtUbicacionVenue;
-    private JTextField txtCapacidadVenue;
-    private JTextField txtRestriccionesVenue;
+    private JTextArea areaInfo;
 
-    private JTextField txtIdEvento;
-    private JTextField txtNombreEvento;
-    private JTextField txtFechaEvento;
-    private JTextField txtHoraEvento;
-    private JComboBox<TipoEvento> cbTipoEvento;
-    private JComboBox<Venue> cbVenues;
-
-    private DefaultListModel<Venue> venuesModel;
-    private JList<Venue> lstVenues;
-
-    private DefaultListModel<Evento> eventosModel;
-    private JList<Evento> lstEventos;
-
-    public OrganizadorFrame(Database db, Organizador organizador) {
-        super("BoletaMaster - Organizador");
+    public OrganizadorFrame(Database db, Marketplace mp, JsonStore jsonStore, MarketplaceStore mpStore, Usuario actual) {
+        super("Organizador - " + actual.getLogin());
         this.db = db;
-        this.organizador = organizador;
+        this.mp = mp;
+        this.jsonStore = jsonStore;
+        this.mpStore = mpStore;
+        this.actual = actual;
+        setSize(720, 420);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        construirUI();
-        cargarDatos();
-        setSize(900, 600);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        add(crearPanelBotones(), BorderLayout.NORTH);
+        add(crearPanelCentro(), BorderLayout.CENTER);
+        refrescarInfo();
     }
 
-    private void construirUI() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(4, 4, 4, 4);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        int y = 0;
-
-        txtIdVenue = new JTextField(10);
-        txtNombreVenue = new JTextField(15);
-        txtUbicacionVenue = new JTextField(15);
-        txtCapacidadVenue = new JTextField(10);
-        txtRestriccionesVenue = new JTextField(15);
-
-        txtIdEvento = new JTextField(10);
-        txtNombreEvento = new JTextField(15);
-        txtFechaEvento = new JTextField(10);
-        txtHoraEvento = new JTextField(10);
-        cbTipoEvento = new JComboBox<>(TipoEvento.values());
-        cbVenues = new JComboBox<>();
-
-        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("ID Venue"), gbc);
-        gbc.gridx = 1; panel.add(txtIdVenue, gbc); y++;
-
-        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Nombre Venue"), gbc);
-        gbc.gridx = 1; panel.add(txtNombreVenue, gbc); y++;
-
-        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Ubicación"), gbc);
-        gbc.gridx = 1; panel.add(txtUbicacionVenue, gbc); y++;
-
-        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Capacidad"), gbc);
-        gbc.gridx = 1; panel.add(txtCapacidadVenue, gbc); y++;
-
-        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Restricciones"), gbc);
-        gbc.gridx = 1; panel.add(txtRestriccionesVenue, gbc); y++;
-
-        JButton btnCrearVenue = new JButton("Crear Venue");
-        gbc.gridx = 0; gbc.gridy = y; gbc.gridwidth = 2;
-        panel.add(btnCrearVenue, gbc);
-        y++;
-
-        gbc.gridwidth = 1;
-
-        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("ID Evento"), gbc);
-        gbc.gridx = 1; panel.add(txtIdEvento, gbc); y++;
-
-        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Nombre Evento"), gbc);
-        gbc.gridx = 1; panel.add(txtNombreEvento, gbc); y++;
-
-        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Fecha (YYYY-MM-DD)"), gbc);
-        gbc.gridx = 1; panel.add(txtFechaEvento, gbc); y++;
-
-        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Hora (HH:MM)"), gbc);
-        gbc.gridx = 1; panel.add(txtHoraEvento, gbc); y++;
-
-        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Tipo Evento"), gbc);
-        gbc.gridx = 1; panel.add(cbTipoEvento, gbc); y++;
-
-        gbc.gridx = 0; gbc.gridy = y; panel.add(new JLabel("Venue"), gbc);
-        gbc.gridx = 1; panel.add(cbVenues, gbc); y++;
-
-        JButton btnCrearEvento = new JButton("Crear Evento");
-        gbc.gridx = 0; gbc.gridy = y; gbc.gridwidth = 2;
-        panel.add(btnCrearEvento, gbc);
-        y++;
-
-        gbc.gridwidth = 1;
-
-        venuesModel = new DefaultListModel<>();
-        lstVenues = new JList<>(venuesModel);
-        lstVenues.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        eventosModel = new DefaultListModel<>();
-        lstEventos = new JList<>(eventosModel);
-        lstEventos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        JPanel listas = new JPanel(new GridBagLayout());
-        GridBagConstraints l = new GridBagConstraints();
-        l.insets = new Insets(4, 4, 4, 4);
-        l.fill = GridBagConstraints.BOTH;
-        l.weightx = 1;
-        l.weighty = 1;
-
-        l.gridx = 0; l.gridy = 0;
-        listas.add(new JScrollPane(lstVenues), l);
-        l.gridx = 1;
-        listas.add(new JScrollPane(lstEventos), l);
-
-        JButton btnAprobarVenue = new JButton("Aprobar Venue");
-        JButton btnIngresos = new JButton("Ver Ingresos Evento");
-
-        JPanel acciones = new JPanel();
-        acciones.add(btnAprobarVenue);
-        acciones.add(btnIngresos);
-
-        add(panel, BorderLayout.NORTH);
-        add(listas, BorderLayout.CENTER);
-        add(acciones, BorderLayout.SOUTH);
-
+    private JPanel crearPanelBotones() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JButton btnCrearVenue = new JButton("Crear venue");
+        JButton btnAprobarVenue = new JButton("Aprobar venue");
+        JButton btnCrearEvento = new JButton("Crear evento");
+        JButton btnRefrescar = new JButton("Refrescar");
+        JButton btnGuardar = new JButton("Guardar");
+        JButton btnSalir = new JButton("Salir");
         btnCrearVenue.addActionListener(e -> crearVenue());
-        btnCrearEvento.addActionListener(e -> crearEvento());
         btnAprobarVenue.addActionListener(e -> aprobarVenue());
-        btnIngresos.addActionListener(e -> ingresosEvento());
+        btnCrearEvento.addActionListener(e -> crearEvento());
+        btnRefrescar.addActionListener(e -> refrescarInfo());
+        btnGuardar.addActionListener(e -> guardar());
+        btnSalir.addActionListener(e -> salir());
+        panel.add(btnCrearVenue);
+        panel.add(btnAprobarVenue);
+        panel.add(btnCrearEvento);
+        panel.add(btnRefrescar);
+        panel.add(btnGuardar);
+        panel.add(btnSalir);
+        return panel;
     }
 
-    private void cargarDatos() {
-        venuesModel.clear();
-        for (Venue v : db.getVenues()) {
-            venuesModel.addElement(v);
-            cbVenues.addItem(v);
+    private JScrollPane crearPanelCentro() {
+        areaInfo = new JTextArea();
+        areaInfo.setEditable(false);
+        return new JScrollPane(areaInfo);
+    }
+
+    private void refrescarInfo() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("VENUES:\n");
+        if (db.getVenues().isEmpty()) {
+            sb.append("  No hay venues.\n");
+        } else {
+            for (Venue v : db.getVenues()) {
+                sb.append("  ").append(v.getId()).append(" - ").append(v.getNombre()).append(" [")
+                  .append(v.isAprobado() ? "aprobado" : "no aprobado").append("]\n");
+            }
         }
-        eventosModel.clear();
-        for (Evento e : db.getEventos()) {
-            eventosModel.addElement(e);
+        sb.append("\nEVENTOS:\n");
+        if (db.getEventos().isEmpty()) {
+            sb.append("  No hay eventos.\n");
+        } else {
+            for (Evento e : db.getEventos()) {
+                sb.append("  ").append(e.getId()).append(" - ").append(e.getNombre()).append(" ")
+                  .append(e.getFecha()).append(" ").append(e.getHora()).append(" | ")
+                  .append(e.getTipo()).append(" | venue=");
+                if (e.getVenue() == null) {
+                    sb.append("N/A");
+                } else {
+                    sb.append(e.getVenue().getNombre());
+                }
+                sb.append("\n");
+            }
         }
+        areaInfo.setText(sb.toString());
     }
 
     private void crearVenue() {
+        String id = JOptionPane.showInputDialog(this, "ID venue:");
+        if (id == null || id.isBlank()) {
+            return;
+        }
+        String nombre = JOptionPane.showInputDialog(this, "Nombre:");
+        if (nombre == null || nombre.isBlank()) {
+            return;
+        }
+        String ubic = JOptionPane.showInputDialog(this, "Ubicación:");
+        if (ubic == null || ubic.isBlank()) {
+            return;
+        }
+        String sCap = JOptionPane.showInputDialog(this, "Capacidad máxima:");
+        if (sCap == null || sCap.isBlank()) {
+            return;
+        }
+        String restr = JOptionPane.showInputDialog(this, "Restricciones de uso:");
+        if (restr == null || restr.isBlank()) {
+            return;
+        }
         try {
-            String id = txtIdVenue.getText().trim();
-            String nombre = txtNombreVenue.getText().trim();
-            String ubic = txtUbicacionVenue.getText().trim();
-            int capacidad = Integer.parseInt(txtCapacidadVenue.getText().trim());
-            String restr = txtRestriccionesVenue.getText().trim();
-            Venue v = new Venue(id, nombre, ubic, capacidad, restr);
-            db.addVenue(v);
-            venuesModel.addElement(v);
-            cbVenues.addItem(v);
-            JOptionPane.showMessageDialog(this, "Venue creado");
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", 0);
+            int cap = Integer.parseInt(sCap.trim());
+            if (cap <= 0) {
+                JOptionPane.showMessageDialog(this, "Capacidad debe ser positiva.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            db.addVenue(new Venue(id.trim(), nombre.trim(), ubic.trim(), cap, restr.trim()));
+            JOptionPane.showMessageDialog(this, "Venue creado.");
+            refrescarInfo();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Capacidad inválida.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void aprobarVenue() {
-        Venue v = lstVenues.getSelectedValue();
-        if (v == null) {
-            JOptionPane.showMessageDialog(this, "Seleccione un venue");
+        if (db.getVenues().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No hay venues.", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        v.aprobar();
-        JOptionPane.showMessageDialog(this, "Venue aprobado");
+        String id = JOptionPane.showInputDialog(this, "ID venue a aprobar:");
+        if (id == null || id.isBlank()) {
+            return;
+        }
+        Venue encontrado = null;
+        for (Venue v : db.getVenues()) {
+            if (v.getId().equals(id.trim())) {
+                encontrado = v;
+                break;
+            }
+        }
+        if (encontrado == null) {
+            JOptionPane.showMessageDialog(this, "No existe ese venue.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        encontrado.aprobar();
+        JOptionPane.showMessageDialog(this, "Venue aprobado.");
+        refrescarInfo();
     }
 
     private void crearEvento() {
+        if (db.getVenues().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No hay venues. Cree y apruebe uno primero.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        String id = JOptionPane.showInputDialog(this, "ID evento:");
+        if (id == null || id.isBlank()) {
+            return;
+        }
+        String nombre = JOptionPane.showInputDialog(this, "Nombre:");
+        if (nombre == null || nombre.isBlank()) {
+            return;
+        }
+        String sFecha = JOptionPane.showInputDialog(this, "Fecha (YYYY-MM-DD):");
+        if (sFecha == null || sFecha.isBlank()) {
+            return;
+        }
+        String sHora = JOptionPane.showInputDialog(this, "Hora (HH:MM):");
+        if (sHora == null || sHora.isBlank()) {
+            return;
+        }
+        Object tipoSel = JOptionPane.showInputDialog(this, "Tipo de evento:", "Tipo",
+                JOptionPane.QUESTION_MESSAGE, null,
+                new Object[] { "musical", "cultural", "deportivo", "religioso" }, "musical");
+        if (tipoSel == null) {
+            return;
+        }
+        TipoEvento tipo;
+        String sTipo = tipoSel.toString();
+        if (sTipo.equals("musical")) {
+            tipo = TipoEvento.musical;
+        } else if (sTipo.equals("cultural")) {
+            tipo = TipoEvento.cultural;
+        } else if (sTipo.equals("deportivo")) {
+            tipo = TipoEvento.deportivo;
+        } else {
+            tipo = TipoEvento.religioso;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Venue v : db.getVenues()) {
+            sb.append(v.getId()).append(" - ").append(v.getNombre()).append(v.isAprobado() ? " [aprobado]" : " [no aprobado]").append("\n");
+        }
+        JOptionPane.showMessageDialog(this, sb.toString(), "Venues disponibles", JOptionPane.INFORMATION_MESSAGE);
+        String idVenue = JOptionPane.showInputDialog(this, "ID del venue a usar:");
+        if (idVenue == null || idVenue.isBlank()) {
+            return;
+        }
+        Venue venue = null;
+        for (Venue v : db.getVenues()) {
+            if (v.getId().equals(idVenue.trim())) {
+                venue = v;
+                break;
+            }
+        }
+        if (venue == null) {
+            JOptionPane.showMessageDialog(this, "Venue no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!venue.isAprobado()) {
+            JOptionPane.showMessageDialog(this, "El venue no está aprobado.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         try {
-            String id = txtIdEvento.getText().trim();
-            String nombre = txtNombreEvento.getText().trim();
-            LocalDate fecha = LocalDate.parse(txtFechaEvento.getText().trim());
-            LocalTime hora = LocalTime.parse(txtHoraEvento.getText().trim());
-            TipoEvento tipo = (TipoEvento) cbTipoEvento.getSelectedItem();
-            Venue venue = (Venue) cbVenues.getSelectedItem();
-            Evento e = new Evento(id, nombre, fecha, hora, tipo, venue);
+            LocalDate fecha = LocalDate.parse(sFecha.trim());
+            LocalTime hora = LocalTime.parse(sHora.trim());
+            Evento e = new Evento(id.trim(), nombre.trim(), fecha, hora, tipo, venue);
             db.addEvento(e);
-            eventosModel.addElement(e);
-            JOptionPane.showMessageDialog(this, "Evento creado");
+            JOptionPane.showMessageDialog(this, "Evento creado.");
+            refrescarInfo();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", 0);
+            JOptionPane.showMessageDialog(this, "Error creando evento: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void ingresosEvento() {
-        Evento e = lstEventos.getSelectedValue();
-        if (e == null) {
-            JOptionPane.showMessageDialog(this, "Seleccione un evento");
-            return;
-        }
-        double total = organizador.consultarIngresosNetos(e);
-        JOptionPane.showMessageDialog(this, "Ingresos netos: $" + total);
+    private void guardar() {
+        jsonStore.save(db);
+        mpStore.save(db, mp);
+        JOptionPane.showMessageDialog(this, "Guardado completo.");
+    }
+
+    private void salir() {
+        guardar();
+        dispose();
+        System.exit(0);
     }
 }
 

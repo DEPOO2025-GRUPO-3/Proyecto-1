@@ -18,6 +18,8 @@ import tiquetes.Tiquete;
 
 public class ImprimirTiqueteDialog extends JDialog {
 
+    private static final long serialVersionUID = 1L;
+
     private final Tiquete tiquete;
 
     public ImprimirTiqueteDialog(java.awt.Frame owner, Tiquete tiquete) {
@@ -94,8 +96,7 @@ public class ImprimirTiqueteDialog extends JDialog {
 
             Path destino = carpetaQR.resolve("tiquete_" + tiquete.getId() + ".png");
 
-            TiqueteQRGenerator gen = new TiqueteQRGenerator();
-            gen.generarQR(tiquete, destino);
+            TiqueteQRGenerator.generarQR(tiquete, destino);
 
             tiquete.registrarImpresion();
 
