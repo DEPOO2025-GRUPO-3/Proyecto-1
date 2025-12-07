@@ -12,14 +12,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import infra.qr.QRCodeService;
 import infra.qr.QRException;
+import infra.qr.TiqueteQRGenerator;
 import tiquetes.Tiquete;
 
 public class ImprimirTiqueteDialog extends JDialog {
 
     private final Tiquete tiquete;
-    private final QRCodeService qrService = new QRCodeService();
 
     public ImprimirTiqueteDialog(java.awt.Frame owner, Tiquete tiquete) {
         super(owner, "Imprimir Tiquete", true);
@@ -95,7 +94,8 @@ public class ImprimirTiqueteDialog extends JDialog {
 
             Path destino = carpetaQR.resolve("tiquete_" + tiquete.getId() + ".png");
 
-            qrService.generarQRDeTiquete(tiquete, destino);
+            TiqueteQRGenerator gen = new TiqueteQRGenerator();
+            gen.generarQR(tiquete, destino);
 
             tiquete.registrarImpresion();
 
